@@ -1,0 +1,117 @@
+/*PROCEDIMIENTO #1 */
+
+SELECT * FROM db_estado_cuenta.tbl_cliente;
+
+DROP PROCEDURE IF EXISTS sp_actualizar_telefono_cliente;
+
+DELIMITER //
+/* Procedimiento para actualizar el teléfono del cliente */
+CREATE PROCEDURE db_estado_cuenta.sp_actualizar_telefono_cliente(
+    IN p_id_cliente INT,
+    IN p_nuevo_telefono VARCHAR(15)
+)
+BEGIN
+    UPDATE tbl_cliente SET telefono = p_nuevo_telefono WHERE id_cliente = p_id_cliente;
+END //
+
+DELIMITER //
+
+/* ejuctar el procedimiento para probarlo usando call */ 
+Call  db_estado_cuenta.sp_actualizar_telefono_cliente(
+	"1", "93254401"
+    );
+    
+    
+    
+    
+/*PRODECIMIENTO #2 */
+
+
+SELECT * FROM db_estado_cuenta.tbl_pagos;
+
+/* Eliminar el procedimiento si ya existe */
+DROP PROCEDURE IF EXISTS registrar_pago;
+
+/* Crear el procedimiento para registar pago*/
+
+DELIMITER //
+CREATE PROCEDURE db_estado_cuenta.sp_registrar_pago(
+    IN p_fecha_pago DATE, 
+    IN p_pago_contado DECIMAL(10,2), 
+    IN p_pago_minimo DECIMAL(10,2), 
+    IN p_metodo_pago INT, 
+    IN p_cuenta INT
+)
+BEGIN
+    /*   Insertar el pago en la tabla */
+	INSERT INTO tbl_pagos (fecha_pago, pago_contado, pago_minimo, tbl_metodos_pago, tbl_cuenta)
+    VALUES (p_fecha_pago, p_pago_contado, p_pago_minimo, p_metodo_pago, p_cuenta);
+END //
+
+DELIMITER ;
+
+/* Ejecutar el procedimiento para probarlo */
+CALL db_estado_cuenta.sp_registrar_pago('2025-03-23', 500.00, 200.00, 1, 101);
+
+
+
+
+
+ /* PROCEDIMEINTO 3 */
+ 
+
+
+SELECT * FROM db_estado_cuenta.tbl_tarjeta;
+
+DROP PROCEDURE IF EXISTS sp_agregar_numero_tarjeta;
+
+DELIMITER //
+
+CREATE PROCEDURE db_estado_cuenta.sp_agregar_numero_tarjeta(
+    IN p_nuevo_numero_tarjeta VARCHAR(19),
+    IN p_tbl_cliente INT,
+    IN p_tbl_tipo_tarjeta INT  -- Agregar parámetro para tipo de tarjeta
+)
+BEGIN
+    INSERT INTO tbl_tarjeta (numero_tarjeta, tbl_cliente, tbl_tipo_tarjeta)
+    VALUES (p_nuevo_numero_tarjeta, p_tbl_cliente, p_tbl_tipo_tarjeta);
+END //
+
+DELIMITER //
+
+CALL db_estado_cuenta.sp_agregar_numero_tarjeta('4446552365687894', 1, 1);
+
+
+
+/* PROCEDIMIENTO #4 */
+
+/* Procedimiento para actualizar la dirección del cliente */
+
+SELECT * FROM db_estado_cuenta.tbl_cliente;
+DELIMITER //
+
+CREATE PROCEDURE db_estado_cuenta.sp_actualizar_direccion_cliente(
+    IN p_id_cliente INT,
+    IN p_nueva_direccion VARCHAR(255)
+)
+BEGIN
+
+    /* Validar que la dirección no sea nula ni vacía y que el ID del cliente sea válido */
+    IF p_nueva_direccion IS NOT NULL AND p_nueva_direccion <> '' 
+       AND p_id_cliente IS NOT NULL AND p_id_cliente > 0 THEN
+       
+        UPDATE tbl_cliente 
+        SET direccion = p_nueva_direccion 
+        WHERE id_cliente = p_id_cliente;
+        
+        COMMIT;  -- Confirmar la transacción
+    ELSE
+        -- Mensaje si no se puede actualizar
+        SELECT 'No se puede actualizar la dirección';
+    END IF;
+END //
+
+DELIMITER //
+
+/* Ejecutar el procedimiento para probarlo */
+CALL db_estado_cuenta.sp_actualizar_direccion_cliente("2", "col.kennedy,Tegucigalpa");

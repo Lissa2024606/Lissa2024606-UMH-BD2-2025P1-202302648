@@ -1,0 +1,163 @@
+-- MySQL Workbench Synchronization
+-- Generated: 2025-03-23 15:53
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: Helen Barrientos
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+ALTER SCHEMA db_estado_cuenta  DEFAULT CHARACTER SET utf8  DEFAULT COLLATE utf8_general_ci ;
+
+ALTER TABLE db_estado_cuenta.tbl_transacciones 
+DROP FOREIGN KEY fk_tbl_transacciones_tbl_cuenta1;
+
+ALTER TABLE db_estado_cuenta.tbl_puntos 
+DROP FOREIGN KEY fk_tbl_puntos_tbl_cliente1;
+
+ALTER TABLE db_estado_cuenta.tbl_pagos 
+DROP FOREIGN KEY fk_tbl_pagos_tbl_cuenta1;
+
+ALTER TABLE db_estado_cuenta.tbl_financiamientos 
+DROP FOREIGN KEY fk_tbl_financiamientos_tbl_cliente1;
+
+ALTER TABLE db_estado_cuenta.tbl_tarjeta 
+DROP FOREIGN KEY fk_tbl_tarjeta_tbl_cliente1,
+DROP FOREIGN KEY fk_tbl_tarjeta_tbl_tipo_tarjeta1;
+
+ALTER TABLE db_estado_cuenta.tbl_cliente 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ;
+
+CREATE TABLE IF NOT EXISTS db_estado_cuenta.tbl_cuenta (
+  id_cuenta INT(11) NOT NULL AUTO_INCREMENT,
+  fecha_corte DATE NOT NULL,
+  fecha_pago DATE NOT NULL,
+  saldo_anterior DECIMAL(10,2) NULL DEFAULT NULL,
+  compras DECIMAL(10,2) NULL DEFAULT NULL,
+  retiros DECIMAL(10,2) NULL DEFAULT NULL,
+  cuota_financiamiento DECIMAL(10,2) NULL DEFAULT NULL,
+  intereses DECIMAL(10,2) NULL DEFAULT NULL,
+  otros DECIMAL(10,2) NULL DEFAULT NULL,
+  saldo_nuevo DECIMAL(10,2) NULL DEFAULT NULL,
+  limite_credito DECIMAL(10,2) NULL DEFAULT NULL,
+  credito_disponible DECIMAL(10,2) NULL DEFAULT NULL,
+  tasa_interes_anual DECIMAL(5,2) NULL DEFAULT NULL,
+  tasa_interes_mensual DECIMAL(5,2) NULL DEFAULT NULL,
+  tbl_cliente INT(11) NOT NULL,
+  PRIMARY KEY (id_cuenta),
+  INDEX fk_tbl_resumen_cuenta_tbl_cliente_idx (tbl_cliente ASC) VISIBLE,
+  CONSTRAINT fk_tbl_resumen_cuenta_tbl_cliente
+    FOREIGN KEY (tbl_cliente)
+    REFERENCES db_estado_cuenta.tbl_cliente (id_cliente)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+ALTER TABLE db_estado_cuenta.tbl_transacciones 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ,
+DROP COLUMN tbl_cuenta,
+ADD COLUMN tbl_cuenta INT(11) NOT NULL AFTER total_dolares,
+ADD INDEX fk_tbl_transacciones_tbl_cuenta1_idx (tbl_cuenta ASC) VISIBLE,
+DROP INDEX fk_tbl_transacciones_tbl_cuenta1_idx ;
+;
+
+ALTER TABLE db_estado_cuenta.tbl_puntos 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ,
+DROP COLUMN tbl_cliente,
+ADD COLUMN tbl_cliente INT(11) NOT NULL AFTER puntos_disponibles,
+ADD INDEX fk_tbl_puntos_tbl_cliente1_idx (tbl_cliente ASC) VISIBLE,
+DROP INDEX fk_tbl_puntos_tbl_cliente1_idx ;
+;
+
+ALTER TABLE db_estado_cuenta.tbl_pagos 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ,
+DROP COLUMN tbl_cuenta,
+DROP COLUMN tbl_metodos_pago,
+ADD COLUMN tbl_metodos_pago INT(11) NOT NULL AFTER pago_minimo,
+ADD COLUMN tbl_cuenta INT(11) NOT NULL AFTER tbl_metodos_pago,
+ADD INDEX fk_tbl_pagos_tbl_metodos_pago1_idx (tbl_metodos_pago ASC) VISIBLE,
+ADD INDEX fk_tbl_pagos_tbl_cuenta1_idx (tbl_cuenta ASC) VISIBLE,
+DROP INDEX fk_tbl_pagos_tbl_cuenta1_idx ,
+DROP INDEX fk_tbl_pagos_tbl_metodos_pago1_idx ;
+;
+
+ALTER TABLE db_estado_cuenta.tbl_financiamientos 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ,
+DROP COLUMN tbl_cliente,
+ADD COLUMN tbl_cliente INT(11) NOT NULL AFTER Saldo,
+ADD INDEX fk_tbl_financiamientos_tbl_cliente1_idx (tbl_cliente ASC) VISIBLE,
+DROP INDEX fk_tbl_financiamientos_tbl_cliente1_idx ;
+;
+
+ALTER TABLE db_estado_cuenta.tbl_tarjeta 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ,
+DROP COLUMN tbl_tipo_tarjeta,
+DROP COLUMN tbl_cliente,
+ADD COLUMN tbl_cliente INT(11) NOT NULL AFTER fecha_emision,
+ADD COLUMN tbl_tipo_tarjeta INT(11) NOT NULL AFTER tbl_cliente,
+ADD INDEX fk_tbl_tarjeta_tbl_cliente1_idx (tbl_cliente ASC) VISIBLE,
+ADD INDEX fk_tbl_tarjeta_tbl_tipo_tarjeta1_idx (tbl_tipo_tarjeta ASC) VISIBLE,
+DROP INDEX fk_tbl_tarjeta_tbl_tipo_tarjeta1_idx ,
+DROP INDEX fk_tbl_tarjeta_tbl_cliente1_idx ;
+;
+
+ALTER TABLE db_estado_cuenta.tbl_metodos_pago 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ;
+
+ALTER TABLE db_estado_cuenta.tbl_tipo_tarjeta 
+CHARACTER SET = utf8 , COLLATE = utf8_general_ci ;
+
+ALTER TABLE db_estado_cuenta.tbl_transacciones 
+ADD CONSTRAINT fk_tbl_transacciones_tbl_cuenta1
+  FOREIGN KEY (tbl_cuenta)
+  REFERENCES db_estado_cuenta.tbl_cuenta (id_cuenta)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE db_estado_cuenta.tbl_puntos 
+ADD CONSTRAINT fk_tbl_puntos_tbl_cliente1
+  FOREIGN KEY (tbl_cliente)
+  REFERENCES db_estado_cuenta.tbl_cliente (id_cliente)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE db_estado_cuenta.tbl_pagos 
+DROP FOREIGN KEY fk_tbl_pagos_tbl_metodos_pago1;
+
+ALTER TABLE db_estado_cuenta.tbl_pagos ADD CONSTRAINT fk_tbl_pagos_tbl_metodos_pago1
+  FOREIGN KEY (tbl_metodos_pago)
+  REFERENCES db_estado_cuenta.tbl_metodos_pago (id_metodos_pago)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT fk_tbl_pagos_tbl_cuenta1
+  FOREIGN KEY (tbl_cuenta)
+  REFERENCES db_estado_cuenta.tbl_cuenta (id_cuenta)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE db_estado_cuenta.tbl_financiamientos 
+ADD CONSTRAINT fk_tbl_financiamientos_tbl_cliente1
+  FOREIGN KEY (tbl_cliente)
+  REFERENCES db_estado_cuenta.tbl_cliente (id_cliente)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE db_estado_cuenta.tbl_tarjeta 
+ADD CONSTRAINT fk_tbl_tarjeta_tbl_cliente1
+  FOREIGN KEY (tbl_cliente)
+  REFERENCES db_estado_cuenta.tbl_cliente (id_cliente)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT fk_tbl_tarjeta_tbl_tipo_tarjeta1
+  FOREIGN KEY (tbl_tipo_tarjeta)
+  REFERENCES db_estado_cuenta.tbl_tipo_tarjeta (idl_tipo_tarjeta)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

@@ -1,0 +1,40 @@
+SELECT * FROM db_estado_cuenta.tbl_cliente;
+
+
+
+/*   Insertando datos de prueba en la tabla cliente  */
+INSERT INTO db_estado_cuenta.tbl_cliente (id_cliente, nombre_cliente, numero_identidad, telefono, direccion)
+VALUE
+	(1, 'Marta', '0801199400012', '123456789', 'avenida mirafloes'),
+	(2, 'Jeff', '0801199733333', '1235426589', 'calle 44,miraflores'),
+	(3, 'Danielle', '0108197800090', '0422753321', 'col colinas');
+    
+   
+   SELECT * FROM db_estado_cuenta.tbl_financiamientos;
+   
+ /*   Insertando datos de prueba en la financiamientos   */
+    INSERT INTO db_estado_cuenta.tbl_financiamientos (tbl_cliente, extra_financiamiento_disponible, saldo) 
+    VALUES
+	(1, 5000.00, 12000.50),
+	(2, 3000.00, 7500.00),
+	(3, 8000.00, 15000.75);
+
+    
+
+SELECT * FROM db_estado_cuenta.tbl_metodos_pago;
+
+/*   Insertando datos de prueba en la tabla medodos pago  */
+INSERT INTO db_estado_cuenta.tbl_metodos_pago (nombre_metodo)
+VALUE
+	('Efectivo'),
+	('Tarjeta de Crédito'),
+	('Tarjeta de Débito'),
+	('Transferencia Bancaria'),
+	('PayPal'),
+	('Criptomonedas');
+    
+
+/*   Inserción de datos de prueba para tbl_cuenta  */ 
+INSERT INTO db_estado_cuenta.tbl_cuenta (fecha_corte, fecha_pago, saldo_anterior, compras, retiros, cuota_financiamiento, intereses, otros, saldo_nuevo, limite_credito, credito_disponible, tasa_interes_anual)
+VALUES
+('2025-03-01', '2025-03-10', 5000.00, 1500.00, 500.00, 200.00, 50.00, 30.00, 6280.00, 10000.00, 3720.00, 18.50);

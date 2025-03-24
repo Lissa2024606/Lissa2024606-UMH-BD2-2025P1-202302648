@@ -1,0 +1,82 @@
+/* FUNCION #1 */
+
+/* Eliminar la función si ya existe */
+DROP FUNCTION IF EXISTS fn_calcular_descuento;
+
+/* Cambiar delimitador para evitar problemas con los puntos y comas dentro de la función */
+DELIMITER //
+
+/* Crear la función */
+CREATE FUNCTION fn_calcular_descuento(
+    p_monto DECIMAL(10,2), 
+    p_descuento DECIMAL(5,2)
+) RETURNS DECIMAL(10,2) 
+DETERMINISTIC
+BEGIN
+    /* Calcular el nuevo monto con el descuento aplicado */
+    DECLARE v_monto_final DECIMAL(10,2);
+    SET v_monto_final = p_monto - (p_monto * p_descuento / 100);
+    RETURN v_monto_final;
+END //
+
+/* Restaurar el delimitador original */
+DELIMITER ;
+
+/* Probar la función */
+SELECT fn_calcular_descuento(1000, 10) AS Monto_Con_Descuento;
+
+
+/* FUNCTION #2 */
+
+
+/* Eliminar la función si ya existe */
+DROP FUNCTION IF EXISTS fn_obtener_nombre_cliente;
+
+/* Cambiar delimitador para evitar problemas con los puntos y comas dentro de la función */
+DELIMITER //
+
+/* Crear la función para obtener el nombre completo de un cliente */
+CREATE FUNCTION fn_obtener_nombre_cliente(
+    p_cliente_id INT
+) RETURNS VARCHAR(255)
+DETERMINISTIC
+BEGIN
+    /* Declarar variable para almacenar el nombre del cliente */
+    DECLARE v_nombre_cliente VARCHAR(255);
+    
+    /* Seleccionar el nombre completo del cliente con el ID proporcionado */
+    SELECT CONCAT(nombre_cliente, ' ', apellido_cliente) INTO v_nombre_cliente
+    FROM tbl_cliente 
+    WHERE id_cliente = p_cliente_id;
+    
+    /* Retornar el nombre completo */
+    RETURN v_nombre_cliente;
+END //
+
+/* Restaurar el delimitador original */
+DELIMITER ;
+
+
+SELECT fn_obtener_nombre_cliente(1) AS nombre_completo_cliente;
+
+
+
+/* Funcion para obtener el saldo actual de una cuenta */
+CREATE FUNCTION fn_obtener_saldo_cuenta(p_id_cuenta INT) RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE saldo_actual DECIMAL(10,2);
+    
+    SELECT saldo_nuevo INTO saldo_actual
+    FROM tbl_cuenta
+    WHERE id_cuenta = p_id_cuenta;
+    
+    RETURN saldo_actual;
+END //
+
+/*Uso:
+Esta función devuelve el saldo actual de una cuenta específica.
+Para ejecutarla, utilice la siguiente consulta:
+SELECT fn_obtener_saldo_cuenta(1);*/
+
+SELECT fn_obtener_saldo_cuenta(1)
